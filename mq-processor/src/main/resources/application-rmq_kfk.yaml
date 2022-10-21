@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: MqProcessorExample
+  cloud.stream:
+    function:
+      definition: receiver
+#      bindings:
+#        receiver-in-0: input
+#        dlq-out-0: dlq
+#        receiver-out-0: output
+    bindings:
+      receiver-in-0:
+        binder: rmqin
+        destination: rcv.x
+        group: rcv
+      receiver-out-0:
+        binder: kfkout
+        destination: rcv.x
+        group: ${spring.application.name}
+      dlq-out-0:
+        destination: rcv.dlx
+        binder: dlq
+    binders:
+      dlq:
+        type: rabbit
+        environment:
+          spring:
+            cloud.stream.rabbit.bindings.dlq-out-0:
+              producer:
+                bindQueue: false
+                declareExchange: false
+                routingKeyExpression: headers['x-original-consumerQueue']
+                #routingKeyExpression: headers['x-original-routingKey']
+                #routingKeyExpression: headers['amqp_receivedRoutingKey']
+      rmqin:
+        type: rabbit
+        environment:
+          spring:
+            cloud.stream.rabbit.bindings.receiver-in-0:
+              consumer:
+                exchangeType: direct
+                queueNameGroupOnly: true
+                autoBindDLQ: true
+                singleActiveConsumer: true
+                deadLetterExchange: rcv.dlx
+                #deadLetterExchangeType: topic
+      kfkout:
+        type: kafka
+        environment:
+          spring:
+            cloud.stream.kafka.binder:
+              autoCreateTopics: false
+  rabbitmq:
+    addresses: amqp://localhost:5672
+
+
+
+logging.level:
+  org.springframework.cloud.stream: DEBUG
+
+
+

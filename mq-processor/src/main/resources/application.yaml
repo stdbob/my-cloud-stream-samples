@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: MqProcessorExample
+#  cloud.stream:
+#    function.definition: consumer
+#    bindings:
+#      consumer-in-0:
+#        binder: inhale
+#        destination: testx
+#        group: test
+#    binders:
+#      inhale:
+#        type: rabbit
+#        environment:
+#          spring:
+#            rabbitmq:
+#              addresses: amqp://localhost:5672
+#            cloud.stream.rabbit.bindings.consumer-in-0:
+#              consumer:
+#                exchangeType: direct
+#                queueNameGroupOnly: true
+#                autoBindDLQ: true
+#                deadLetterExchange: test.dlx
+#
+#
+#
+#logging.level:
+#  org.springframework.cloud.stream.binder.rabbit: DEBUG
+
+
+

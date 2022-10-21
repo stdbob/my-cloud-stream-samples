@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: MqProcessorExample
+  cloud.stream:
+    function.definition: receiver
+    bindings:
+      receiver-in-0:
+        binder: intake
+        destination: rcv.x
+        group: ${spring.application.name}
+      dlq-out-0:
+        destination: error.rcv.x.${spring.application.name}
+        binder: dlq
+    binders:
+      dlq:
+        type: kafka
+#        environment:
+#          spring:
+#            cloud.stream.kafka.binder:
+#                autoCreateTopics
+#                requiredAcks
+#            cloud.stream.kafka.bindings.dlq-out-0:
+#              producer:
+#                bindQueue: false
+#                declareExchange: false
+#                messageKeyExpression: headers['x-original-routingKey']
+      intake:
+        type: kafka
+        environment:
+          spring:
+            cloud.stream.kafka.bindings.receiver-in-0:
+              consumer:
+                enableDlq: true
+                #deadLetterExchangeType: topic
+                #resetOffsets=true
+                #startOffset=earliest
+
+
+
+logging.level:
+  org.springframework.cloud.stream: DEBUG
+
+
+
